@@ -17,7 +17,7 @@ async function walk(dir) {
 }
 const files = await walk(root);
 const htmlFiles = files.filter((f) => f.endsWith('.html'));
-assert.equal(htmlFiles.length, 10, 'Expected nine content pages plus 404');
+assert.equal(htmlFiles.length, pages().length + 1, 'Expected all content pages plus 404');
 const pageCache = new Map(await Promise.all(htmlFiles.map(async (file) => [file, await readFile(file, 'utf8')])));
 const descriptions = new Set();
 const titles = new Set();
@@ -52,12 +52,16 @@ for (const [file, html] of pageCache) {
   for (const match of html.matchAll(/<label\b[^>]*for="([^"]+)"/g)) {
     check(ids.includes(match[1]), `${name}: label without input ${match[1]}`);
   }
-  const references = [...html.matchAll(/\b(?:href|src)="([^"]+)"/g)].map((m) => m[1]);
-  references.push(...[...html.matchAll(/\bsrcset="([^"]+)"/g)].flatMap((m) => m[1].split(',').map((s) => s.trim().split(' ')[0])));
-  for (const reference of references) {
+  const references = [...html.matchAll(/<([a-z][a-z0-9-]*)\b[^>]*?\b(href|src)="([^"]+)"/g)].map((m) => ({ reference: m[3], navigation: m[1] === 'a' && m[2] === 'href' }));
+  references.push(...[...html.matchAll(/\bsrcset="([^"]+)"/g)].flatMap((m) => m[1].split(',').map((s) => ({ reference: s.trim().split(' ')[0], navigation: false }))));
+  for (const { reference, navigation } of references) {
     if (/^(mailto:|tel:)/.test(reference)) { links++; continue; }
-    check(!/^https?:\/\//.test(reference), `${name}: unexpected external dependency ${reference}`);
-    if (/^(https?:|data:)/.test(reference)) continue;
+    if (/^https?:\/\//.test(reference)) {
+      check(navigation && reference.startsWith('https://'), `${name}: unexpected external dependency or insecure link ${reference}`);
+      if (navigation) links++;
+      continue;
+    }
+    if (reference.startsWith('data:')) continue;
     const [rawPath, rawHash] = reference.split('#');
     const targetPath = rawPath.split('?')[0];
     let target = targetPath
@@ -98,6 +102,14 @@ for (const page of pages()) {
 const contact = pageCache.get(path.join(root, 'kontakt', 'index.html'));
 check(contact.includes('type="email"') && contact.includes('name="message"'), 'Contact form missing fields');
 check(contact.includes('Wiadomość wyślesz samodzielnie.'), 'Contact form must explain its email handoff');
+const privacy = pageCache.get(path.join(root, 'polityka-prywatnosci', 'index.html'));
+check(privacy?.includes('name="robots" content="noindex, nofollow"') && privacy.includes('Projekt do weryfikacji'), 'Unconfirmed privacy draft must retain its visible status and noindex');
+check(contact.includes('aria-describedby="contact-privacy"'), 'Contact form must reference its visible privacy notice');
+check(!/type="checkbox"/.test(contact), 'The contact composer does not require a consent checkbox');
+for (const [file, html] of pageCache) {
+  const footer = html.match(/<footer\b[\s\S]*?<\/footer>/)?.[0];
+  check(footer?.includes('href="/polityka-prywatnosci/"'), `${path.relative(root, file)}: missing footer privacy link`);
+}
 
 // Contrast pairs used for text and interactive elements.
 function luminance(hex) {
