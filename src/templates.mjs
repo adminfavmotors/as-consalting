@@ -68,7 +68,7 @@ export function layout(page) {
   <meta property="og:description" content="${escape(description)}">
   <link rel="icon" href="${asset(route, 'favicon.svg')}" type="image/svg+xml">
   <link rel="preload" href="${asset(route, 'fonts/barlow-regular.ttf')}" as="font" type="font/ttf" crossorigin>
-  <link rel="preload" href="${asset(route, 'fonts/saira-regular.ttf')}" as="font" type="font/ttf" crossorigin>
+  <link rel="preload" href="${asset(route, 'fonts/saira-medium.ttf')}" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="${asset(route, 'styles.css')}">
   <script src="${asset(route, 'site.js')}" defer></script>
 </head>

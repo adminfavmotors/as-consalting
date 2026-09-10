@@ -10,13 +10,13 @@ Inspected the live Polish home pages of [Audi](https://www.audi.pl/pl/) and [Por
 
 ## Implemented direction
 
-- Saira regular for headings: upright, restrained technical letterforms. Barlow for readable body copy and controls. Font files and OFL licences are local.
-- White `#ffffff`, graphite `#171a1e`, dark steel `#121519`, cool grey `#f1f2f3`. Secondary text `#5d636b`; dark-section text `#f5f6f7` / `#b7bdc5`.
+- Saira medium (500) for headings: upright, restrained technical letterforms. Barlow for readable body copy and controls. Font files and OFL licences are local.
+- White `#ffffff`, graphite `#171a1e`, dark steel `#121519`, cool grey `#f1f2f3`. Secondary text `#4e555e`; dark-section text `#f5f6f7` / `#c5cbd3`.
 - Full-width automotive-detail hero, with a scrim solely for text readability. No floating experience badge, serif quotation, ornamental monogram, coloured italic text, ambient circles or entrance choreography.
 - Compact typographic wordmark; direct service navigation below the hero. Open columns for the service overview; a single dedicated section explaining the development programme.
 - About page uses actual career dates and roles. Clients page uses factual rows of organisation, project and period instead of a decorative card wall.
 - Page titles and copy describe the actual service. Decorative numbered section labels have been removed; numbers remain where they identify a service or a process step.
-- Functional contact composer, FAQ, relative links, keyboard focus and mobile menu retained. All nine content pages and the 404 page use the revised styles.
+- Functional contact composer, FAQ, root-relative links, keyboard focus and mobile menu retained. All nine content pages and the 404 page use the revised styles.
 - Responsive breakpoints: 1150, 900, 640 and 370px. Reduced-motion preferences disable transitions and smooth scrolling.
 
 ## Skill application
@@ -30,3 +30,7 @@ Used frontend-design and ui-ux-pro-max. The automotive query supported a full-wi
 The previous editorial version is archived in `archive/editorial-v1.zip`. Old assets are retained in the archive rather than loaded by the current site.
 
 Offline checks cover all page links, assets, metadata, form labels, ARIA references and CSS token contrast. Browser preview of `file://` was blocked by the browser URL policy. No workaround and no local HTTP server were used; visual and interactive checks await the separately requested server setup.
+
+## Readability refinement
+
+Headings move from 400 to 500; body text stays regular to retain a clear hierarchy. Secondary text has stronger contrast on both light and dark surfaces. Base copy is 18px with 1.7 line height; service summaries and programme steps are slightly larger. Action buttons and text links use the existing Barlow semibold (600) font. Heading preload now targets Saira medium. The composition, palette direction and service claims are unchanged.
