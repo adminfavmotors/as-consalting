@@ -1,5 +1,7 @@
 import { company, services, clients, career } from './content.mjs';
 import { privacyPage } from './privacy.mjs';
+import { cookiesPage } from './cookies.mjs';
+import { consentScript } from './consent-config.mjs';
 
 export const escape = (value = '') => String(value).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const arrow = '<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg>';
@@ -49,7 +51,7 @@ function header(route) {
 }
 
 function footer(route) {
-  return `<footer class="site-footer"><div class="wrap footer-top"><div class="footer-brand"><a href="${link(route)}" class="brand" aria-label="A.S. Consulting — strona główna"><span class="brand-wordmark">A.S. CONSULTING</span><span class="brand-subline">ANDRZEJ SADOWSKI</span></a><p>Doradztwo dla branży motoryzacyjnej.<br>Rozwój dealerstw od 2005 roku.</p></div><nav aria-label="Strony w stopce"><h2>Firma</h2><a href="${link(route, 'polityka-prywatnosci')}">Polityka prywatności</a><a href="${link(route, 'o-firmie')}">Andrzej Sadowski</a><a href="${link(route, 'klienci')}">Klienci</a><a href="${link(route, 'kontakt')}">Kontakt</a></nav><nav aria-label="Usługi w stopce"><h2>Oferta</h2>${services.map((s) => `<a href="${link(route, s.path)}">${s.title}</a>`).join('')}</nav><div class="footer-contact"><h2>Kontakt bezpośredni</h2><a href="tel:${company.phoneHref}">${company.phone}</a><a href="mailto:${company.email}">${company.email}</a></div></div><div class="wrap footer-bottom"><span>A.S. Consulting · Andrzej Sadowski</span><a href="#top">Do góry <span aria-hidden="true">↑</span></a></div></footer>`;
+  return `<footer class="site-footer"><div class="wrap footer-top"><div class="footer-brand"><a href="${link(route)}" class="brand" aria-label="A.S. Consulting — strona główna"><span class="brand-wordmark">A.S. CONSULTING</span><span class="brand-subline">ANDRZEJ SADOWSKI</span></a><p>Doradztwo dla branży motoryzacyjnej.<br>Rozwój dealerstw od 2005 roku.</p></div><nav aria-label="Strony w stopce"><h2>Firma</h2><a href="${link(route, 'polityka-prywatnosci')}">Polityka prywatności</a><a href="/cookies/">Polityka cookies</a><a href="/cookies/#ustawienia" data-cookie-settings>Ustawienia cookies</a><a href="${link(route, 'o-firmie')}">Andrzej Sadowski</a><a href="${link(route, 'klienci')}">Klienci</a><a href="${link(route, 'kontakt')}">Kontakt</a></nav><nav aria-label="Usługi w stopce"><h2>Oferta</h2>${services.map((s) => `<a href="${link(route, s.path)}">${s.title}</a>`).join('')}</nav><div class="footer-contact"><h2>Kontakt bezpośredni</h2><a href="tel:${company.phoneHref}">${company.phone}</a><a href="mailto:${company.email}">${company.email}</a></div></div><div class="wrap footer-bottom"><span>A.S. Consulting · Andrzej Sadowski</span><a href="#top">Do góry <span aria-hidden="true">↑</span></a></div></footer>`;
 }
 
 export function layout(page) {
@@ -72,6 +74,7 @@ ${page.robots ? `  <meta name="robots" content="${escape(page.robots)}">` : ''}
   <link rel="preload" href="${asset(route, 'fonts/barlow-regular.ttf')}" as="font" type="font/ttf" crossorigin>
   <link rel="preload" href="${asset(route, 'fonts/saira-medium.ttf')}" as="font" type="font/ttf" crossorigin>
   <link rel="stylesheet" href="${asset(route, 'styles.css')}">
+${consentScript()}
   <script src="${asset(route, 'site.js')}" defer></script>
 </head>
 <body data-page="${route || 'home'}">
@@ -151,6 +154,7 @@ export function pages() {
     ...services.map((s) => ({ route: s.path, title: s.title, description: s.intro, body: servicePage(s) })),
     { route: 'klienci', title: 'Klienci i historia współpracy', description: 'Wybrane projekty A.S. Consulting dla sieci BMW, Renault, Ford, Toyota, Nissan, Honda i innych. Szkolenia, audyty i rozwój dealerów.', body: clientsPage() },
     privacyPage(),
+    cookiesPage(),
     { route: 'kontakt', title: 'Kontakt z Andrzejem Sadowskim', description: 'Porozmawiajmy o rozwoju Twojego dealerstwa. Andrzej Sadowski: +48 601 240 928, andrzej@sadowski-consulting.pl.', body: contact() },
   ];
 }

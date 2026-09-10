@@ -6,7 +6,7 @@
   "description": "Wielostronicowa strona A.S. Consulting Andrzej Sadowski",
   "scripts": {
     "build": "node scripts/build.mjs",
-    "check": "node scripts/check.mjs"
+    "check": "node scripts/check.mjs && node --test tests/consent.test.mjs"
   },
   "engines": { "node": "24.x" }
 }

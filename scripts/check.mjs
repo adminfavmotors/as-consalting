@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url';
 import path from 'node:path';
 import assert from 'node:assert/strict';
 import { pages } from '../src/templates.mjs';
+import { getConsentConfig } from '../src/consent-config.mjs';
 
 const root = fileURLToPath(new URL('../dist/', import.meta.url));
 async function walk(dir) {
@@ -25,6 +26,7 @@ let links = 0;
 let assets = 0;
 const failures = [];
 const check = (condition, message) => { if (!condition) failures.push(message); };
+const consentConfig = getConsentConfig();
 
 for (const [file, html] of pageCache) {
   const name = path.relative(root, file);
@@ -34,6 +36,7 @@ for (const [file, html] of pageCache) {
   check(html.includes('name="viewport"'), `${name}: missing viewport`);
   check(html.includes('class="skip-link"'), `${name}: missing skip link`);
   check(html.includes('<main id="main"'), `${name}: missing main landmark`);
+  check(html.includes('id="site-consent"') === consentConfig.enabled, `${name}: consent loader does not match build configuration`);
   check(!/\b(?:TODO|FIXME|Lorem ipsum|undefined|NaN)\b/.test(html), `${name}: placeholder text`);
   const title = html.match(/<title>(.*?)<\/title>/)?.[1];
   const description = html.match(/name="description" content="([^"]+)"/)?.[1];
@@ -109,6 +112,7 @@ check(!/type="checkbox"/.test(contact), 'The contact composer does not require a
 for (const [file, html] of pageCache) {
   const footer = html.match(/<footer\b[\s\S]*?<\/footer>/)?.[0];
   check(footer?.includes('href="/polityka-prywatnosci/"'), `${path.relative(root, file)}: missing footer privacy link`);
+  check(footer?.includes('href="/cookies/#ustawienia" data-cookie-settings'), `${path.relative(root, file)}: missing cookie settings fallback`);
 }
 
 // Contrast pairs used for text and interactive elements.
@@ -141,6 +145,6 @@ if (failures.length) {
 } else {
   console.log(`PASS: ${htmlFiles.length} HTML pages, ${links} links, ${assets} local asset references.`);
   console.log('PASS: unique metadata, heading landmarks, IDs, form labels, ARIA references, text contrast.');
-  console.log('PASS: no runtime CDN, tracking, network or persistent storage code.');
+  console.log(`PASS: contact composer has no network/storage side effects; analytics integration ${consentConfig.enabled ? 'configured for ' + consentConfig.hostname : 'inactive'}.`);
   console.log('No server started. Browser rendering and hosted routing are separate checks.');
 }
