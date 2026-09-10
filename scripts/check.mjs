@@ -60,9 +60,17 @@ for (const [file, html] of pageCache) {
     if (/^(https?:|data:)/.test(reference)) continue;
     const [rawPath, rawHash] = reference.split('#');
     const targetPath = rawPath.split('?')[0];
-    const target = targetPath ? path.resolve(path.dirname(file), decodeURIComponent(targetPath)) : file;
-    check(target.startsWith(root), `${name}: path escapes dist: ${reference}`);
-    try { await stat(target); } catch { failures.push(`${name}: missing target ${reference}`); continue; }
+    let target = targetPath
+      ? targetPath.startsWith('/')
+        ? path.resolve(root, `.${decodeURIComponent(targetPath)}`)
+        : path.resolve(path.dirname(file), decodeURIComponent(targetPath))
+      : file;
+    const relativeTarget = path.relative(root, target);
+    check(!relativeTarget.startsWith('..') && !path.isAbsolute(relativeTarget), `${name}: path escapes dist: ${reference}`);
+    try {
+      if ((await stat(target)).isDirectory()) target = path.join(target, 'index.html');
+      await stat(target);
+    } catch { failures.push(`${name}: missing target ${reference}`); continue; }
     if (rawHash) {
       const destination = pageCache.get(target);
       check(destination?.includes(`id="${rawHash}"`), `${name}: missing anchor ${reference}`);

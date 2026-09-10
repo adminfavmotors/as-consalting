@@ -12,9 +12,9 @@ const iconPaths = {
   mail: '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="m3 6 9 7 9-7"/>',
 };
 export function icon(name) { return `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true">${iconPaths[name] || iconPaths.compass}</svg>`; }
-const base = (route) => route ? '../'.repeat(route.split('/').length) : './';
-export const link = (route, target = '') => `${base(route)}${target ? `${target}/` : ''}index.html`;
-const asset = (route, name) => `${base(route)}assets/${name}`;
+// Root-relative URLs also work when 404.html is served for an unknown nested URL.
+export const link = (_route, target = '') => target ? `/${target}/` : '/';
+const asset = (_route, name) => `/assets/${name}`;
 function button(route, target, label, secondary = false, extra = '') {
   return `<a class="button${secondary ? ' button-secondary' : ''}" href="${link(route, target)}${extra}">${label}${arrow}</a>`;
 }
